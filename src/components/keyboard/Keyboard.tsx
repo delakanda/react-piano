@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import "./Keyboard.css";
 import { KEYBOARD_KEYS } from '../../constants/Piano';
 import { TKeyboardKey } from '../../types/Keyboard';
@@ -9,9 +9,20 @@ type TKeyboardProps = {
 };
 
 function Keyboard(props: TKeyboardProps) {
+
+  // Variable Ref to track mounting & unmounting boolean for component
+  // To prevent "cannot set state on unmounted component" error
+  const mountedRef = useRef<boolean>(false);
   
   const [keyboardKeys] = useState<TKeyboardKey[]>(KEYBOARD_KEYS);
   const [activeKey, setActiveKey] = useState<string>("");
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    }
+  }, []);
 
   const keyPress = useCallback((key: string) => {
     // Set active key for highlighting
@@ -19,7 +30,7 @@ function Keyboard(props: TKeyboardProps) {
 
     // Remove active key highlight
     setTimeout(() => {
-      setActiveKey("");
+      if(mountedRef.current) setActiveKey("");
     }, 300);
 
     // Call parent that a key was pressed

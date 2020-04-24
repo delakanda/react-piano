@@ -12,7 +12,7 @@ function Logger(props: TLoggerProps) {
       <div className="log-heading">
         <small><i>Piano Logs</i></small>
       </div>
-      <div>
+      <div data-testid="log-item-container">
         {props.keyLogs.map((log: string, idx: number) => {
           return (
             <span key={idx} className="log-item">{log}</span>

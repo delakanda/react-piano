@@ -47,8 +47,8 @@ function App() {
         } 
 
       } else {
-        clearInterval(hightlightInterval);
         setInputActiveKey("");
+        clearInterval(hightlightInterval);
       }
     }, KEYBOARD_KEY_PRESS_TIMEOUT);
   }, [])
