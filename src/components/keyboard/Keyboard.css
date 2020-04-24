@@ -1,4 +1,4 @@
-div#keyboard {
+div.keyboard {
 
 }
 
@@ -9,6 +9,7 @@ div#keyboard {
   padding: 10px;
   border: 1px solid #A1A1A1;
   position: relative;
+  cursor: pointer;
 }
 
 .key.highlight {
@@ -26,6 +27,6 @@ div#keyboard {
   z-index: 999;
   right: -30px;
   width: 60px;
-  height: 300px;
+  height: 350px;
   background-color: #000;
 }

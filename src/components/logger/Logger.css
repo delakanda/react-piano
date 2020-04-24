@@ -1,0 +1,20 @@
+.logger-section {
+  background-color: #F1F1F1;
+  width: 50%;
+  margin-top: 30px !important;
+  padding: 10px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.log-heading {
+  margin-bottom: 5px;
+}
+
+.log-item {
+  background-color: #FFF;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 3px 5px;
+  margin-right: 2px;
+}

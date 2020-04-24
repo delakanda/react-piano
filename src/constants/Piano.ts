@@ -33,3 +33,5 @@ export const KEYBOARD_KEYS: TKeyboardKey[] = [
     blackKeyOverlap: false
   }
 ];
+
+export const KEYBOARD_KEY_PRESS_TIMEOUT = 1000;

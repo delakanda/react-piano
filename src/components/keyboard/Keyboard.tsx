@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import "./Keyboard.css";
 import { KEYBOARD_KEYS } from '../../constants/Piano';
 import { TKeyboardKey } from '../../types/Keyboard';
 
 type TKeyboardProps = {
-  activeKey: string;
+  inputActiveKey: string;
+  handleKeyboardKeyPress: Function;
 };
 
 function Keyboard(props: TKeyboardProps) {
   
   const [keyboardKeys] = useState<TKeyboardKey[]>(KEYBOARD_KEYS);
+  const [activeKey, setActiveKey] = useState<string>("");
+
+  const keyPress = useCallback((key: string) => {
+    // Set active key for highlighting
+    setActiveKey(key);
+
+    // Remove active key highlight
+    setTimeout(() => {
+      setActiveKey("");
+    }, 300);
+
+    // Call parent that a key was pressed
+    props.handleKeyboardKeyPress(key);
+  }, [props]);
   
   return (
-    <div id="keyboard">
+    <div className="keyboard">
       {keyboardKeys.map((keyboardKey) => {
         return (
-          <div key={keyboardKey.key} className={`key ${props.activeKey === keyboardKey.key ? 'highlight' : ''}`}>
+          <div key={keyboardKey.key} 
+            onClick={() => keyPress(keyboardKey.key)} 
+            className={`key ${(activeKey === keyboardKey.key || props.inputActiveKey === keyboardKey.key) ? 'highlight' : ''}`}>
             {keyboardKey.blackKeyOverlap && <div className="black-key"></div> }
             <div className="key-letter">{keyboardKey.key}</div>
           </div>

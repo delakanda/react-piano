@@ -1,39 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './App.css';
-import { KEYBOARD_KEYS } from './constants/Piano';
 import Keyboard from './components/keyboard/Keyboard';
+import Logger from './components/logger/Logger';
+import { KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
+import TextField from './components/textInputSection/TextInputSection';
+import { isCorrentKeyboardKey } from './utils/Piano';
 
 function App() {
 
-  const [keyInput, setKeyInput] = useState<string>("");
-  const [activeKey, setActiveKey] = useState<string>("");
+  // General key logs
+  const [keyLogs, setKeyLogs] = useState<string[]>([]);
 
-  const setKeyInputHandler = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    setKeyInput(e.currentTarget.value);
-  }
+  // Current active key being played from the text input
+  const [inputActiveKey, setInputActiveKey] = useState<string>("");
 
-  const playKeyboard = () => {
-    highlightKeys();
-  }
+  useEffect(() => {
+    // update logs ... when input active key is set
+    if(inputActiveKey) {
+      const _logs = [...keyLogs];
+      _logs.push(inputActiveKey);
+      setKeyLogs(_logs);
+    }
+  }, [inputActiveKey])
 
-  const highlightKeys = () => {
-    let keysSplit = keyInput.split('');
+  /*
+  * Function to handle any App-wise side effects of keyboard press
+  */
+  const handleKeyboardKeyPress = useCallback((key: string) => {
+    // Append log
+    const _logs = [...keyLogs];
+    _logs.push(key);
+    setKeyLogs(_logs);
+  }, [keyLogs]);
+
+  /*
+  * Function to highlight keys entered in input box
+  */
+  const highlightKeys = useCallback((inputKeys: string) => {
+    let keysSplit = inputKeys.split(',');
     
-    let inter = setInterval(() => {
+    
+    const hightlightInterval = setInterval(() => {
       if(keysSplit.length > 0) {
-        let highlight = keysSplit.shift();
-        if(highlight) setActiveKey(highlight);
+        let highlightedKey = keysSplit.shift();
+        
+        // Check if key exists on keyboard before taking action
+        if(highlightedKey && isCorrentKeyboardKey(highlightedKey)) {
+            setInputActiveKey(highlightedKey);
+        } else {
+          setInputActiveKey("");
+        }
+
       } else {
-        clearInterval(inter);
-        setActiveKey("");
+        clearInterval(hightlightInterval);
+        setInputActiveKey("");
       }
-    }, 500);
-  }
+    }, KEYBOARD_KEY_PRESS_TIMEOUT);
+  }, [])
+
+  /*
+  * Function to play keyboard from letters entered into input box
+  */
+  const playKeyboard = useCallback((inputKeys: string) => {
+    highlightKeys(inputKeys);
+  }, [highlightKeys])
 
   return (
     <div className="App">
       <h2>Bleacher Report Piano</h2>
-      <Keyboard activeKey={activeKey} />
+      <Keyboard handleKeyboardKeyPress={handleKeyboardKeyPress} inputActiveKey={inputActiveKey} />
+
+      {/* Testing another piano instance */}
+      {/* <Keyboard handleKeyboardKeyPress={handleKeyboardKeyPress} inputActiveKey={inputActiveKey} /> */}
+
+      <Logger keyLogs={keyLogs} />
+
+      <TextField playKeyboard={playKeyboard} />
     </div>
   );
 }
