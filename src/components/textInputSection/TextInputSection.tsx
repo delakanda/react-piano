@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './TextInputSection.css';
 import { getInvalidKeys } from '../../utils/Piano';
 
@@ -9,15 +9,16 @@ type TTextInputSectionProps = {
 function TextInputSection(props: TTextInputSectionProps) {
 
   const [keyInput, setKeyInput] = useState<string>("");
-  const [invalidLetters, setInvalidLetters] = useState<string[]>([]);
+  // const [invalidLetters, setInvalidLetters] = useState<string[]>([]);
+  const [invalidLetter, setInvalidLetter] = useState<string | null>(null);
 
   // Check if entered keyboard keys are all correct. If not, save error key 
-  useEffect(() => {
-    if(keyInput) {
-      const invalidKeys = getInvalidKeys(keyInput.split(','));
-      setInvalidLetters(invalidKeys);
-    }
-  }, [keyInput])
+  // useEffect(() => {
+  //   if(keyInput) {
+  //     const invalidKeys = getInvalidKeys(keyInput.split(','));
+  //     setInvalidLetters(invalidKeys);
+  //   }
+  // }, [keyInput]);
 
   const play = () => {
     setKeyInput('');
@@ -25,8 +26,19 @@ function TextInputSection(props: TTextInputSectionProps) {
   };
 
   const saveKeyInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyInput(e.target.value);
-  }
+    // if(!e.target.value) setInvalidLetters([]);
+    const invalidKeys = getInvalidKeys(e.target.value.toLocaleUpperCase().split(','));
+    if(invalidKeys.length === 0) {
+      setKeyInput(e.target.value);
+    } else {
+      // Flash an error message showing the user has entered an invalid key
+      // error disappears after 1 second
+      setInvalidLetter(invalidKeys[0]);
+      setTimeout(() => {
+        setInvalidLetter(null);
+      }, 1000);
+    }
+  };
   
   return (
     <div className="text-input-section">
@@ -38,13 +50,13 @@ function TextInputSection(props: TTextInputSectionProps) {
 
       <button className="play-button" 
         onClick={() => play()}
-        disabled={invalidLetters.length > 0 ? true: false}>
+        disabled={(!keyInput) ? true : false}>
         Play >
       </button>
 
-      {invalidLetters.length > 0 &&
-        <div>
-          Invalid letters : {invalidLetters.join(',')}
+      {invalidLetter &&
+        <div className="error-display">
+          Invalid Key : {invalidLetter}
         </div>
       }
     </div>

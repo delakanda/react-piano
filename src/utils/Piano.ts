@@ -26,10 +26,9 @@ export function getInvalidKeys(searchKeys: string[]) {
   let invalidKeys: string[] = [];
   searchKeys.forEach((elem) => {
     if(elem){
-      let found = pianoKeys.find((item) => item.key === elem);
+      let found = pianoKeys.find((item) => item.key === elem.toLocaleUpperCase());
       if(!found) invalidKeys.push(elem);
     }
   });
-  console.log(invalidKeys)
   return invalidKeys;
 }

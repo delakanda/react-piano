@@ -21,4 +21,15 @@
   background-color: #21a560;
   color: #FFF;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.play-button:disabled {
+  background-color: #D1D1D1;
+}
+
+.error-display {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
 }
