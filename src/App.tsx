@@ -43,13 +43,12 @@ function App() {
     const hightlightInterval = setInterval(() => {
       if(keysSplit.length > 0) {
         let highlightedKey = keysSplit.shift();
-        
-        // Check if key exists on keyboard before taking action
+        // highlightedKey possibly undefined
         if(highlightedKey && isCorrentKeyboardKey(highlightedKey)) {
             setInputActiveKey(highlightedKey);
         } else {
           setInputActiveKey("");
-        }
+        } 
 
       } else {
         clearInterval(hightlightInterval);
@@ -62,7 +61,7 @@ function App() {
   * Function to play keyboard from letters entered into input box
   */
   const playKeyboard = useCallback((inputKeys: string) => {
-    highlightKeys(inputKeys);
+    highlightKeys(inputKeys.toLocaleUpperCase());
   }, [highlightKeys])
 
   return (

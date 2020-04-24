@@ -1,5 +1,10 @@
 import { KEYBOARD_KEYS } from "../constants/Piano";
 
+/**
+* Function to check if a single key is a valid keyboard key
+* Returns an boolean of whether key is a valid keyboard key or not
+* @param {string} searchKey - A key to check if it is a valid keyboard key
+*/
 export function isCorrentKeyboardKey(searchKey: string) {
   const pianoKeys = KEYBOARD_KEYS;
   const keyFound = pianoKeys.find((pianoKey) => {
@@ -9,4 +14,22 @@ export function isCorrentKeyboardKey(searchKey: string) {
   if(keyFound) return true;
 
   return false;
+}
+
+/**
+* Function to get all invalid piano letters
+* Returns an array of invalid keys
+* @param {string[]} searchKeys - An array of keys to sift through
+*/
+export function getInvalidKeys(searchKeys: string[]) {
+  const pianoKeys = KEYBOARD_KEYS;
+  let invalidKeys: string[] = [];
+  searchKeys.forEach((elem) => {
+    if(elem){
+      let found = pianoKeys.find((item) => item.key === elem);
+      if(!found) invalidKeys.push(elem);
+    }
+  });
+  console.log(invalidKeys)
+  return invalidKeys;
 }
