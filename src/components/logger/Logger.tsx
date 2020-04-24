@@ -8,7 +8,7 @@ type TLoggerProps = {
 function Logger(props: TLoggerProps) {
 
   return (
-    <div className="logger-section">
+    <div data-testid="logger-section" className="logger-section">
       <div className="log-heading">
         <small><i>Piano Logs</i></small>
       </div>

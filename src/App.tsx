@@ -23,9 +23,7 @@ function App() {
     }
   }, [inputActiveKey])
 
-  /*
-  * Function to handle any App-wise side effects of keyboard press
-  */
+  // Function to handle any App-wise side effects of keyboard press
   const handleKeyboardKeyPress = useCallback((key: string) => {
     // Append log
     const _logs = [...keyLogs];
@@ -33,9 +31,7 @@ function App() {
     setKeyLogs(_logs);
   }, [keyLogs]);
 
-  /*
-  * Function to highlight keys entered in input box
-  */
+  // Function to highlight keys entered in input box
   const highlightKeys = useCallback((inputKeys: string) => {
     let keysSplit = inputKeys.split(',');
     

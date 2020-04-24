@@ -41,21 +41,22 @@ function TextInputSection(props: TTextInputSectionProps) {
   };
   
   return (
-    <div className="text-input-section">
+    <div data-testid="text-input-section" className="text-input-section">
       <input 
+        data-testid="key-text-input"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => saveKeyInput(e)}
         type="text" 
         value={keyInput}
         placeholder="Enter comma (,) delimited keyboard letters here..." />
 
-      <button className="play-button" 
+      <button data-testid="play-button" className="play-button" 
         onClick={() => play()}
         disabled={(!keyInput) ? true : false}>
         Play >
       </button>
 
       {invalidLetter &&
-        <div className="error-display">
+        <div data-testid="error-display" className="error-display">
           Invalid Key : {invalidLetter}
         </div>
       }

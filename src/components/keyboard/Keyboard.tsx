@@ -27,7 +27,7 @@ function Keyboard(props: TKeyboardProps) {
   }, [props]);
   
   return (
-    <div className="keyboard">
+    <div data-testid="keyboard" className="keyboard">
       {keyboardKeys.map((keyboardKey) => {
         return (
           <div key={keyboardKey.key} 
