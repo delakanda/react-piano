@@ -1,77 +1,100 @@
-import React from 'react';
-import { render, fireEvent, cleanup, waitForDomChange, wait } from '@testing-library/react';
-import TextInputSection from './TextInputSection';
-import { KEYBOARD_KEYS } from '../../constants/Piano';
+import React from "react";
+import { render, cleanup } from "@testing-library/react";
+import TextInputSection from "./TextInputSection";
+import { KEYBOARD_KEYS } from "../../constants/Piano";
+import { fireKeyPressOnTextInput, TEST_SELECTORS } from "../../testHelpers/TextInputSection";
 
-const INVALID_KEY = 'Q';
+const INVALID_KEY = "Q";
 const VALID_KEY = KEYBOARD_KEYS[0].key;
 
 const mockFn = jest.fn();
 
 afterEach(cleanup);
+beforeEach(() => {
+  mockFn.mockClear();
+});
 
-test('Test if play button is disabled by default', () => {
-  const { playButton } = setup();
+test("should display the play button", () => {
+  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
+
+  const textInput = getByTestId(TEST_SELECTORS.textInput);
+
+  expect(textInput).toBeVisible();
+});
+
+test("should display an input field", () => {
+  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
+
+  const playButton = getByTestId(TEST_SELECTORS.playButton);
+
+  expect(playButton).toBeVisible();
+  expect(playButton.textContent).toContain("Play");
+});
+
+test("play button should be disabled by default", () => {
+  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
+
+  const playButton = getByTestId(TEST_SELECTORS.playButton);
+
   expect(playButton).toBeDisabled();
 });
 
-test('Test if entering correct keyboard key value shows up in text input', () => {
-  const { textInput } = setup();
+test("entering correct keyboard key value shows up in text input", () => {
+  const util = render(<TextInputSection playKeyboard={mockFn} />);
 
-  fireEvent.change(textInput, { target: { value: VALID_KEY } });
-  expect(textInput.value).toBe(VALID_KEY);
+  const textInput = fireKeyPressOnTextInput({
+    inputValue: VALID_KEY,
+    renderedUtil: util
+  });
+
+  expect(textInput.value).toBe(`${VALID_KEY}`);
 });
 
-test('Test if play button is enabled after entering a correct keyboard key value', () => {
-  const { textInput, playButton } = setup();
+test("error prompt is not displayed if correct keyboard value is entered", async () => {
+  const util = render(<TextInputSection playKeyboard={mockFn} />);
 
-  fireEvent.change(textInput, { target: { value: VALID_KEY } });
+  fireKeyPressOnTextInput({
+    inputValue: VALID_KEY,
+    renderedUtil: util
+  });
+  const errorField = util.queryByTestId(TEST_SELECTORS.errorField);
+
+  expect(errorField).toBeNull();
+});
+
+test("play button is enabled after entering a correct keyboard key value", () => {
+  const util = render(<TextInputSection playKeyboard={mockFn} />);
+
+  fireKeyPressOnTextInput({
+    inputValue: VALID_KEY,
+    renderedUtil: util
+  });
+  const playButton = util.getByTestId(TEST_SELECTORS.playButton);
+
   expect(playButton).toBeEnabled();
 });
 
+test("entering an invalid keyboard key does not show up in text input", () => {
+  const util = render(<TextInputSection playKeyboard={mockFn} />);
 
-test('Test if entering an invalid keyboard key shows up in text input', () => {
-  const { textInput } = setup();
+  const textInput = fireKeyPressOnTextInput({
+    inputValue: INVALID_KEY,
+    renderedUtil: util
+  });
 
-  fireEvent.change(textInput, { target: { value: INVALID_KEY } });
-  expect(textInput.value).toBe('');
+  expect(textInput.value).toBe("");
 });
 
-test('Test if invalid keyboard key entry makes the button disabled', () => {
-  const { textInput, playButton } = setup();
+test("entering an invalid keyboard key displays the invalid key prompt", () => {
+  const util = render(<TextInputSection playKeyboard={mockFn} />);
 
-  fireEvent.change(textInput, { target: { value: INVALID_KEY } });
-  expect(playButton).toBeDisabled();
+  fireKeyPressOnTextInput({
+    inputValue: INVALID_KEY,
+    renderedUtil: util
+  });
+
+  const errorField = util.getByTestId(TEST_SELECTORS.errorField);
+  expect(errorField).toBeVisible();
+
+  expect(errorField.textContent).toContain(INVALID_KEY);
 });
-
-test('Test if invalid keyboard key entry displays error message', () => {
-  const { textInput, getByTestId } = setup();
-
-  fireEvent.change(textInput, { target: { value: INVALID_KEY } });
-  waitForDomChange();
-  const errorDisplay = getByTestId('error-display');
-  expect(errorDisplay.textContent).toBe(`Invalid Key : ${INVALID_KEY}`);
-});
-
-test('Test if entering input and clicking the play button clears the text input value', () => {
-  const { textInput, playButton } = setup();
-
-  fireEvent.change(textInput, { target: { value: VALID_KEY } });
-  fireEvent.click(playButton);
-
-  waitForDomChange();
-
-  expect(textInput.value).toBe('');
-});
-
-// Functions
-function setup() {
-  const utils = render(<TextInputSection playKeyboard={mockFn} />)
-  const textInput = utils.getByTestId('key-text-input');
-  const playButton = utils.getByTestId('play-button');
-  return {
-    textInput,
-    playButton,
-    ...utils,
-  }
-}

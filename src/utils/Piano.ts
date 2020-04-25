@@ -5,7 +5,7 @@ import { KEYBOARD_KEYS } from "../constants/Piano";
 * Returns an boolean of whether key is a valid keyboard key or not
 * @param {string} searchKey - A key to check if it is a valid keyboard key
 */
-export function isCorrentKeyboardKey(searchKey: string) {
+export function isCorrectKeyboardKey(searchKey: string) {
   const pianoKeys = KEYBOARD_KEYS;
   const keyFound = pianoKeys.find((pianoKey) => {
     return pianoKey.key === searchKey;

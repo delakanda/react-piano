@@ -4,7 +4,6 @@ import Keyboard from './components/keyboard/Keyboard';
 import Logger from './components/logger/Logger';
 import { KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
 import TextField from './components/textInputSection/TextInputSection';
-import { isCorrentKeyboardKey } from './utils/Piano';
 import { InputActiveKey } from './types/Keyboard';
 
 function App() {
@@ -14,53 +13,53 @@ function App() {
 
   // Current active key being played from the text input
   const [inputActiveKey, setInputActiveKey] = useState<InputActiveKey | null>(null);
+  const [textInput, setTextInput] = useState("");
 
   useEffect(() => {
     // update logs ... when input active key is set
     if(inputActiveKey) {
-      const _logs = [...keyLogs];
-      _logs.push(inputActiveKey.input);
-      setKeyLogs(_logs);
+      setKeyLogs(keyLogs => [...keyLogs, inputActiveKey.input]);
     }
   }, [inputActiveKey]);
+
+  useEffect(() => {
+    let keys = textInput.toUpperCase().split(",").filter(key => key !== "");
+
+    const intervalId = setInterval(() => {
+      if (keys.length === 0) {
+        clearInterval(intervalId);
+        setInputActiveKey(null);
+        return;
+      }
+
+      let highlightedKey = keys.shift() as string;
+
+      setInputActiveKey(inputActiveKey => ({
+        input: highlightedKey,
+        id: inputActiveKey ? inputActiveKey.id + 1 : 1
+      }));
+
+    }, KEYBOARD_KEY_PRESS_TIMEOUT);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [textInput]);
 
   // Function to handle any App-wise side effects of keyboard press
   const handleKeyboardKeyPress = useCallback((key: string) => {
     // Append log
-    const _logs = [...keyLogs];
-    _logs.push(key);
-    setKeyLogs(_logs);
-  }, [keyLogs]);
-
-  // Function to highlight keys entered in input box
-  const highlightKeys = useCallback((inputKeys: string) => {
-    let keysSplit = inputKeys.split(',');
-    
-    const hightlightInterval = setInterval(() => {
-      if(keysSplit.length > 0) {
-        let highlightedKey = keysSplit.shift();
-        // highlightedKey possibly undefined
-        if(highlightedKey && isCorrentKeyboardKey(highlightedKey)) {
-          setInputActiveKey({ input: highlightedKey, id: inputActiveKey ? inputActiveKey.id + 1 : 1 });
-        } else {
-          setInputActiveKey(null);
-        } 
-
-      } else {
-        setInputActiveKey(null);
-        clearInterval(hightlightInterval);
-      }
-    }, KEYBOARD_KEY_PRESS_TIMEOUT);
-  }, [inputActiveKey]);
+    setKeyLogs(keyLogs => [...keyLogs, key]);
+  }, []);
 
   /*
   * Function to play keyboard from letters entered into input box
   */
-  const playKeyboard = useCallback((inputKeys: string) => {
-    highlightKeys(inputKeys.toLocaleUpperCase());
-  }, [highlightKeys]);
-
-
+  const playKeyboard = (textInputValue: string) => {
+    setTextInput(textInputValue);
+  };
 
   return (
     <div className="App">

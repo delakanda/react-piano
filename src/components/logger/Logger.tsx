@@ -15,7 +15,7 @@ function Logger(props: TLoggerProps) {
       <div data-testid="log-item-container">
         {props.keyLogs.map((log: string, idx: number) => {
           return (
-            <span key={idx} className="log-item">{log}</span>
+            <span data-testid="log-item" key={idx} className="log-item">{log}</span>
           )
         })}
       </div>
