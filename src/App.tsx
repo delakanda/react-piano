@@ -5,6 +5,7 @@ import Logger from './components/logger/Logger';
 import { KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
 import TextField from './components/textInputSection/TextInputSection';
 import { isCorrentKeyboardKey } from './utils/Piano';
+import { InputActiveKey } from './types/Keyboard';
 
 function App() {
 
@@ -12,16 +13,16 @@ function App() {
   const [keyLogs, setKeyLogs] = useState<string[]>([]);
 
   // Current active key being played from the text input
-  const [inputActiveKey, setInputActiveKey] = useState<string>("");
+  const [inputActiveKey, setInputActiveKey] = useState<InputActiveKey | null>(null);
 
   useEffect(() => {
     // update logs ... when input active key is set
     if(inputActiveKey) {
       const _logs = [...keyLogs];
-      _logs.push(inputActiveKey);
+      _logs.push(inputActiveKey.input);
       setKeyLogs(_logs);
     }
-  }, [inputActiveKey])
+  }, [inputActiveKey]);
 
   // Function to handle any App-wise side effects of keyboard press
   const handleKeyboardKeyPress = useCallback((key: string) => {
@@ -35,30 +36,31 @@ function App() {
   const highlightKeys = useCallback((inputKeys: string) => {
     let keysSplit = inputKeys.split(',');
     
-    
     const hightlightInterval = setInterval(() => {
       if(keysSplit.length > 0) {
         let highlightedKey = keysSplit.shift();
         // highlightedKey possibly undefined
         if(highlightedKey && isCorrentKeyboardKey(highlightedKey)) {
-            setInputActiveKey(highlightedKey);
+          setInputActiveKey({ input: highlightedKey, id: inputActiveKey ? inputActiveKey.id + 1 : 1 });
         } else {
-          setInputActiveKey("");
+          setInputActiveKey(null);
         } 
 
       } else {
-        setInputActiveKey("");
+        setInputActiveKey(null);
         clearInterval(hightlightInterval);
       }
     }, KEYBOARD_KEY_PRESS_TIMEOUT);
-  }, [])
+  }, [inputActiveKey]);
 
   /*
   * Function to play keyboard from letters entered into input box
   */
   const playKeyboard = useCallback((inputKeys: string) => {
     highlightKeys(inputKeys.toLocaleUpperCase());
-  }, [highlightKeys])
+  }, [highlightKeys]);
+
+
 
   return (
     <div className="App">

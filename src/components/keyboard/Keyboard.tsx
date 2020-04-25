@@ -1,36 +1,25 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import "./Keyboard.css";
 import { KEYBOARD_KEYS } from '../../constants/Piano';
-import { TKeyboardKey } from '../../types/Keyboard';
+import { TKeyboardKey, InputActiveKey } from '../../types/Keyboard';
 
 type TKeyboardProps = {
-  inputActiveKey: string;
+  inputActiveKey: InputActiveKey | null;
   handleKeyboardKeyPress: Function;
 };
 
 function Keyboard(props: TKeyboardProps) {
 
-  // Variable Ref to track mounting & unmounting boolean for component
-  // To prevent "cannot set state on unmounted component" error
-  const mountedRef = useRef<boolean>(false);
-  
   const [keyboardKeys] = useState<TKeyboardKey[]>(KEYBOARD_KEYS);
   const [activeKey, setActiveKey] = useState<string>("");
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    }
-  }, []);
 
   const keyPress = useCallback((key: string) => {
     // Set active key for highlighting
     setActiveKey(key);
 
     // Remove active key highlight
-    setTimeout(() => {
-      if(mountedRef.current) setActiveKey("");
+    setTimeout(() => { 
+      setActiveKey("");
     }, 300);
 
     // Call parent that a key was pressed
@@ -43,7 +32,7 @@ function Keyboard(props: TKeyboardProps) {
         return (
           <div key={keyboardKey.key} 
             onClick={() => keyPress(keyboardKey.key)} 
-            className={`key ${(activeKey === keyboardKey.key || props.inputActiveKey === keyboardKey.key) ? 'highlight' : ''}`}>
+            className={`key ${(activeKey === keyboardKey.key || props.inputActiveKey?.input === keyboardKey.key) ? 'highlight' : ''}`}>
             {keyboardKey.blackKeyOverlap && <div className="black-key"></div> }
             <div className="key-letter">{keyboardKey.key}</div>
           </div>

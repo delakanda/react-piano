@@ -5,6 +5,7 @@ import { KEYBOARD_KEYS } from '../../constants/Piano';
 
 // const VALID_KEY = KEYBOARD_KEYS[0].key;
 const mockFn = jest.fn();
+const defaultInptActiveKey = {id: 1, input: ""};
 
 afterEach(cleanup);
 
@@ -33,7 +34,7 @@ test('Keyboard key press should highlight key', () => {
 
 // Functions
 function setup() {
-  const utils = render(<Keyboard handleKeyboardKeyPress={mockFn} inputActiveKey={''} />)
+  const utils = render(<Keyboard handleKeyboardKeyPress={mockFn} inputActiveKey={defaultInptActiveKey} />)
   const keyboardContainers = utils.getAllByTestId('keyboard');
   return {
     keyboardContainers,

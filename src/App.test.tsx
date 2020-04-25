@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, cleanup, fireEvent, waitForDomChange } from '@testing-library/react';
 import App from './App';
-import { KEYBOARD_KEYS, KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
+import { KEYBOARD_KEYS } from './constants/Piano';
 
 const FIRST_KEYBOARD_KEY = KEYBOARD_KEYS[0].key;
 
