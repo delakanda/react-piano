@@ -12,6 +12,12 @@ import { act } from "react-dom/test-utils";
 const mockFn = jest.fn();
 const defaultInptActiveKey = { id: 1, input: "" };
 
+beforeEach(() => {
+  mockFn.mockClear();
+})
+beforeAll(() => jest.useFakeTimers());
+afterAll(() => jest.useRealTimers());
+afterEach(cleanup);
 
 // Functions
 const setup = () => {
@@ -22,10 +28,6 @@ const setup = () => {
     />
   );
 };
-
-beforeAll(() => jest.useFakeTimers());
-afterAll(() => jest.useRealTimers());
-afterEach(cleanup);
 
 test("renders all keyboard keys", () => {
   const { getAllByTestId, getByTestId } = setup();

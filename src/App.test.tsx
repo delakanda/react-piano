@@ -3,7 +3,7 @@ import { render, RenderResult, waitForElement } from '@testing-library/react';
 import App from './App';
 import { KEYBOARD_KEYS, KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
 import { act } from 'react-dom/test-utils';
-import { fireKeyPressOnTextInput, clickPlayBtn } from './testHelpers/TextInputSection';
+import { fireInputChangeOnTextInput, clickPlayBtn } from './testHelpers/TextInputSection';
 import { LOGGER_SELECTORS } from './testHelpers/Logger';
 import { KEYBOARD_SELECTORS } from './testHelpers/Keyboard';
 
@@ -13,7 +13,7 @@ afterAll(() => jest.useRealTimers());
 const setup = (): RenderResult => {
   const app = render(<App />);
 
-  fireKeyPressOnTextInput({
+  fireInputChangeOnTextInput({
     inputValue: KEYBOARD_KEYS.map(entry => entry.key).join(","),
     renderedUtil: app
   });
@@ -49,12 +49,22 @@ test("highlights entered keys on the keyboard", async () => {
 
   const keyboardKeys = app.getAllByTestId(KEYBOARD_SELECTORS.key);
 
-  keyboardKeys.forEach(key => {
+  let keyboardKeysMultiArr = [];
+
+  let sliceCount = 1;
+  for(let i = 0; i < keyboardKeys.length; i += KEYBOARD_KEYS.length) {
+    keyboardKeysMultiArr.push([...keyboardKeys].slice(i, sliceCount * KEYBOARD_KEYS.length));
+    sliceCount++;
+  }
+
+  for(let i = 0; i < KEYBOARD_KEYS.length; i++) {
     act(() => {
       clickPlayBtn({ renderedUtil: app });
       jest.advanceTimersByTime(KEYBOARD_KEY_PRESS_TIMEOUT);
     });
 
-    expect(key.className).toBe("key highlight");
-  });
+    keyboardKeysMultiArr.forEach((kMultiItem) => {
+      expect(kMultiItem[i].className).toBe("key highlight");
+    });
+  }
 });
