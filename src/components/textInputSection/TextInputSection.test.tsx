@@ -47,7 +47,7 @@ test("entering correct keyboard key value shows up in text input", () => {
     renderedUtil: util
   });
 
-  expect(textInput.value).toBe(`${VALID_KEY}`);
+  expect(textInput.value).toBe(`${VALID_KEY},`);
 });
 
 test("error prompt is not displayed if correct keyboard value is entered", async () => {

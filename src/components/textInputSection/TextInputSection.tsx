@@ -17,9 +17,26 @@ function TextInputSection(props: TTextInputSectionProps) {
   };
 
   const saveKeyInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const nativeInputEvent = e.nativeEvent as InputEvent;
+
+    if(nativeInputEvent.data === ",") return;
+
+    if(nativeInputEvent.inputType === "deleteContentBackward") {
+      setKeyInput(keyInput => {
+        let splitRes = keyInput.substring(0, keyInput.length - 1);
+        splitRes = splitRes.substring(0, splitRes.length - 1);
+
+        return splitRes;
+      });
+
+      return;
+    }
+
     const invalidKeys = getInvalidKeys(e.target.value.toLocaleUpperCase().split(','));
+
     if(invalidKeys.length === 0) {
-      setKeyInput(e.target.value);
+      setKeyInput(`${e.target.value},`);
     } else {
       // Flash an error message showing the user has entered an invalid key
       // error disappears after 1 second
