@@ -2,23 +2,19 @@ import React, { useState } from 'react';
 import './TextInputSection.css';
 import { getInvalidKeys } from '../../utils/Piano';
 
-type TTextInputSectionProps = {
-  playKeyboard: Function;
-};
+function TextInputSection(props) {
 
-function TextInputSection(props: TTextInputSectionProps) {
-
-  const [keyInput, setKeyInput] = useState<string>("");
-  const [invalidLetter, setInvalidLetter] = useState<string | null>(null);
+  const [keyInput, setKeyInput] = useState("");
+  const [invalidLetter, setInvalidLetter] = useState(null);
 
   const play = () => {
     setKeyInput('');
     props.playKeyboard(keyInput);
   };
 
-  const saveKeyInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const saveKeyInput = (e) => {
 
-    const nativeInputEvent = e.nativeEvent as InputEvent;
+    const nativeInputEvent = e.nativeEvent;
 
     if(nativeInputEvent.data === ",") return;
 
@@ -51,7 +47,7 @@ function TextInputSection(props: TTextInputSectionProps) {
     <div data-testid="text-input-section" className="text-input-section">
       <input 
         data-testid="key-text-input"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => saveKeyInput(e)}
+        onChange={(e) => saveKeyInput(e)}
         type="text" 
         value={keyInput}
         placeholder="Enter comma (,) delimited keyboard letters here..." />

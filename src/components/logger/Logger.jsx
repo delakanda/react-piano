@@ -1,11 +1,7 @@
 import React from 'react';
 import './Logger.css';
 
-type TLoggerProps = {
-  keyLogs: string[];
-};
-
-function Logger(props: TLoggerProps) {
+function Logger(props) {
 
   return (
     <div data-testid="logger-section" className="logger-section">
@@ -13,7 +9,7 @@ function Logger(props: TLoggerProps) {
         <small><i>Piano Logs</i></small>
       </div>
       <div data-testid="log-item-container">
-        {props.keyLogs.map((log: string, idx: number) => {
+        {props.keyLogs.map((log, idx) => {
           return (
             <span data-testid="log-item" key={idx} className="log-item">{log}</span>
           )

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, RenderResult, waitForElement } from '@testing-library/react';
+import { render, waitForElement } from '@testing-library/react';
 import App from './App';
 import { KEYBOARD_KEYS, KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
 import { act } from 'react-dom/test-utils';
@@ -10,7 +10,7 @@ import { KEYBOARD_SELECTORS } from './testHelpers/Keyboard';
 beforeAll(() => jest.useFakeTimers());
 afterAll(() => jest.useRealTimers());
 
-const setup = (): RenderResult => {
+const setup = () => {
   const app = render(<App />);
 
   fireInputChangeOnTextInput({

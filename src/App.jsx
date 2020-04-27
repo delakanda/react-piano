@@ -4,15 +4,14 @@ import Keyboard from './components/keyboard/Keyboard';
 import Logger from './components/logger/Logger';
 import { KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
 import TextField from './components/textInputSection/TextInputSection';
-import { InputActiveKey } from './types/Keyboard';
 
 function App() {
 
   // General key logs
-  const [keyLogs, setKeyLogs] = useState<string[]>([]);
+  const [keyLogs, setKeyLogs] = useState([]);
 
   // Current active key being played from the text input
-  const [inputActiveKey, setInputActiveKey] = useState<InputActiveKey | null>(null);
+  const [inputActiveKey, setInputActiveKey] = useState(null);
   const [textInput, setTextInput] = useState("");
 
   useEffect(() => {
@@ -32,7 +31,7 @@ function App() {
         return;
       }
 
-      let highlightedKey = keys.shift() as string;
+      let highlightedKey = keys.shift();
 
       setInputActiveKey(inputActiveKey => ({
         input: highlightedKey,
@@ -49,7 +48,7 @@ function App() {
   }, [textInput]);
 
   // Function to handle any App-wise side effects of keyboard press
-  const handleKeyboardKeyPress = useCallback((key: string) => {
+  const handleKeyboardKeyPress = useCallback((key) => {
     // Append log
     setKeyLogs(keyLogs => [...keyLogs, key]);
   }, []);
@@ -57,7 +56,7 @@ function App() {
   /*
   * Function to play keyboard from letters entered into input box
   */
-  const playKeyboard = (textInputValue: string) => {
+  const playKeyboard = (textInputValue) => {
     setTextInput(textInputValue);
   };
 

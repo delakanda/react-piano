@@ -1,9 +1,7 @@
-import { TKeyboardKey } from "../types/Keyboard";
-
 /*
 * Various Keys to be shown on the keyboard
 */
-export const KEYBOARD_KEYS: TKeyboardKey[] = [
+export const KEYBOARD_KEYS = [
   {
     key: "C",
     blackKeyOverlap: true

@@ -1,16 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import "./Keyboard.css";
 import { KEYBOARD_KEYS } from '../../constants/Piano';
-import { InputActiveKey } from '../../types/Keyboard';
 
-type TKeyboardProps = {
-  inputActiveKey: InputActiveKey | null;
-  handleKeyboardKeyPress: Function;
-};
+function Keyboard(props) {
 
-function Keyboard(props: TKeyboardProps) {
-
-  const [activeKey, setActiveKey] = useState<string>("");
+  const [activeKey, setActiveKey] = useState("");
   const { handleKeyboardKeyPress } = props;
 
   useEffect(() => {
@@ -23,7 +17,7 @@ function Keyboard(props: TKeyboardProps) {
     }
   }, [activeKey]);
 
-  const keyPress = useCallback((key: string) => {
+  const keyPress = useCallback((key) => {
     // Set active key for highlighting
     setActiveKey(key);
 
