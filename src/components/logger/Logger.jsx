@@ -5,7 +5,7 @@ function Logger(props) {
 
   return (
     <div data-testid="logger-section" className="logger-section">
-      <div className="log-heading">
+      <div data-testid="logger-heading" className="log-heading">
         <small><i>Piano Logs</i></small>
       </div>
       <div data-testid="log-item-container">

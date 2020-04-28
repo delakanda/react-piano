@@ -1,58 +1,52 @@
 import React from "react";
-import {
-  render,
-  cleanup,
-  fireEvent,
-} from "@testing-library/react";
+import { mount } from 'enzyme';
 import Keyboard from "./Keyboard";
+import { KEYBOARD_SELECTORS } from "../../testHelpers/Keyboard";
+import { getByTestIdSelection } from "../../testHelpers/Common";
 import { KEYBOARD_KEYS } from "../../constants/Piano";
-import { act } from "react-dom/test-utils";
 
-// const VALID_KEY = KEYBOARD_KEYS[0].key;
 const mockFn = jest.fn();
-const defaultInptActiveKey = { id: 1, input: "" };
-
 beforeEach(() => {
   mockFn.mockClear();
 })
-beforeAll(() => jest.useFakeTimers());
-afterAll(() => jest.useRealTimers());
-afterEach(cleanup);
 
-// Functions
-const setup = () => {
-  return render(
-    <Keyboard
+const defaultInptActiveKey = { id: 1, input: "" };
+
+describe('Keyboard display & functionality', () => {
+
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = mount(<Keyboard 
       handleKeyboardKeyPress={mockFn}
       inputActiveKey={defaultInptActiveKey}
-    />
-  );
-};
+    />);
+  });
 
-test("renders all keyboard keys", () => {
-  const { getAllByTestId, getByTestId } = setup();
+  it('should be visible', () => {
+    const keyboard = wrapper.find(getByTestIdSelection(KEYBOARD_SELECTORS.keyboard)).at(0);
 
-  expect(getByTestId("keyboard")).toBeVisible();
-  expect(getAllByTestId("keyboard-key")).toHaveLength(KEYBOARD_KEYS.length);
-});
+    expect(keyboard.exists()).toBe(true);
+  });
 
-test("Keyboard key press should highlight key", () => {
-  const { getAllByTestId } = setup();
+  it('should render all keyboard keys', () => {   
+    const keyboardKeys = wrapper.find(getByTestIdSelection(KEYBOARD_SELECTORS.key));
 
-  const keyboardKeys = getAllByTestId("keyboard-key");
+    expect(keyboardKeys).toHaveLength(KEYBOARD_KEYS.length);
+  });
 
-  expect.hasAssertions();
+  it('Keyboard key press should highlight key', () => {
 
-  keyboardKeys.forEach(key => {
-    act(() => {
-      fireEvent.click(key);
+    // expect at least one assertion
+    expect.assertions();
+
+    KEYBOARD_KEYS.forEach((key, idx) => {
+      const keyboardKey = wrapper.find(getByTestIdSelection(KEYBOARD_SELECTORS.key)).at(idx);
+      keyboardKey.simulate('click');
+
+      // refind key because of immutability of enzyme v3
+      const reFoundKeyboardKey = wrapper.find(getByTestIdSelection(KEYBOARD_SELECTORS.key)).at(idx);
+      expect(reFoundKeyboardKey.hasClass('highlight')).toBe(true);
     });
-    
-    expect(key.className).toBe("key highlight");
-
-    act(() => {
-      jest.advanceTimersByTime(300);
-    });
-
   });
 });

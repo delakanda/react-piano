@@ -1,100 +1,97 @@
 import React from "react";
-import { render, cleanup } from "@testing-library/react";
 import TextInputSection from "./TextInputSection";
 import { KEYBOARD_KEYS } from "../../constants/Piano";
-import { fireInputChangeOnTextInput, TEXT_INPUT_SELECTORS } from "../../testHelpers/TextInputSection";
+import { fireInputChangeOnElement, TEXT_INPUT_SELECTORS, clickPlayBtn } from "../../testHelpers/TextInputSection";
+import { mount } from "enzyme";
+import { getByTestIdSelection } from "../../testHelpers/Common";
 
 const INVALID_KEY = "//";
 const VALID_KEY = KEYBOARD_KEYS[0].key;
 
 const mockFn = jest.fn();
 
-afterEach(cleanup);
 beforeEach(() => {
   mockFn.mockClear();
 });
 
-test("should display an input field", () => {
-  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
 
-  const textInput = getByTestId(TEXT_INPUT_SELECTORS.textInput);
+describe('Input section Functionality', () => {
 
-  expect(textInput).toBeVisible();
-});
+  let wrapper;
 
-test("should display the play button and have correct text", () => {
-  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
-
-  const playButton = getByTestId(TEXT_INPUT_SELECTORS.playButton);
-
-  expect(playButton).toBeVisible();
-  expect(playButton.textContent).toContain("Play");
-});
-
-test("play button should be disabled by default", () => {
-  const { getByTestId } = render(<TextInputSection playKeyboard={mockFn} />);
-
-  const playButton = getByTestId(TEXT_INPUT_SELECTORS.playButton);
-
-  expect(playButton).toBeDisabled();
-});
-
-test("entering correct keyboard key value shows up in text input", () => {
-  const util = render(<TextInputSection playKeyboard={mockFn} />);
-
-  const textInput = fireInputChangeOnTextInput({
-    inputValue: VALID_KEY,
-    renderedUtil: util
+  beforeEach(() => {
+    wrapper = mount(<TextInputSection playKeyboard={mockFn} />);
   });
 
-  expect(textInput.value).toBe(`${VALID_KEY},`);
-});
+  it("should display an input field", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
 
-test("error prompt is not displayed if correct keyboard value is entered", async () => {
-  const util = render(<TextInputSection playKeyboard={mockFn} />);
-
-  fireInputChangeOnTextInput({
-    inputValue: VALID_KEY,
-    renderedUtil: util
-  });
-  const errorField = util.queryByTestId(TEXT_INPUT_SELECTORS.errorField);
-
-  expect(errorField).toBeNull();
-});
-
-test("play button is enabled after entering a correct keyboard key value", () => {
-  const util = render(<TextInputSection playKeyboard={mockFn} />);
-
-  fireInputChangeOnTextInput({
-    inputValue: VALID_KEY,
-    renderedUtil: util
-  });
-  const playButton = util.getByTestId(TEXT_INPUT_SELECTORS.playButton);
-
-  expect(playButton).toBeEnabled();
-});
-
-test("entering an invalid keyboard key does not show up in text input", () => {
-  const util = render(<TextInputSection playKeyboard={mockFn} />);
-
-  const textInput = fireInputChangeOnTextInput({
-    inputValue: INVALID_KEY,
-    renderedUtil: util
+    expect(textInput.exists()).toBe(true);
   });
 
-  expect(textInput.value).toBe("");
-});
-
-test("entering an invalid keyboard key displays the invalid key prompt", () => {
-  const util = render(<TextInputSection playKeyboard={mockFn} />);
-
-  fireInputChangeOnTextInput({
-    inputValue: INVALID_KEY,
-    renderedUtil: util
+  it("should display the play button and have correct text", () => {
+    const playButton = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.playButton)).at(0);
+  
+    expect(playButton.exists()).toBe(true);
+    expect(playButton.text()).toContain("Play");
   });
 
-  const errorField = util.getByTestId(TEXT_INPUT_SELECTORS.errorField);
-  expect(errorField).toBeVisible();
+  it("should disable play button by default", () => {
+    const playButton = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.playButton)).at(0);
+    expect(playButton.prop('disabled')).toBe(true);
+  });
 
-  expect(errorField.textContent).toContain(INVALID_KEY);
+  it("should display text in input when entering correct keyboard key value", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: VALID_KEY});
+    
+    // Refind input because of immutability of enzyme v3
+    const refoundInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+
+    expect(refoundInput.prop('value')).toBe(`${VALID_KEY},`);
+  });
+
+  it("should not display error prompt if correct keyboard value is entered", async () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: VALID_KEY});
+
+    const errorField = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.errorField));
+    expect(errorField.exists()).toBe(false);
+  });
+
+  it("should enable play button after entering a correct keyboard key value", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: VALID_KEY});
+
+    const playButton = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.playButton));
+    expect(playButton.prop('disabled')).toBe(false);
+  });
+
+  it("should not show any value in input after entering an invalid keyboard key", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: INVALID_KEY});
+
+    const refoundInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+  
+    expect(refoundInput.prop('value')).toBe("");
+  });
+
+  it("should display an invalid key error message when an invalid keyboard key is entered", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: INVALID_KEY});
+  
+    const errorField = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.errorField));
+    expect(errorField.exists()).toBe(true);
+    expect(errorField.text()).toContain(INVALID_KEY);
+  });
+
+  it("should clear text input when play button is clicked", () => {
+    const textInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: textInput, inputValue: VALID_KEY});
+
+    clickPlayBtn({ wrapper });
+
+    const refoundTextInput = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    expect(refoundTextInput.prop('value')).toBe("");
+  });
 });

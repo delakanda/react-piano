@@ -1,70 +1,62 @@
 import React from 'react';
-import { render, waitForElement } from '@testing-library/react';
 import App from './App';
 import { KEYBOARD_KEYS, KEYBOARD_KEY_PRESS_TIMEOUT } from './constants/Piano';
-import { act } from 'react-dom/test-utils';
-import { fireInputChangeOnTextInput, clickPlayBtn } from './testHelpers/TextInputSection';
+import { clickPlayBtn, fireInputChangeOnElement, TEXT_INPUT_SELECTORS } from './testHelpers/TextInputSection';
 import { LOGGER_SELECTORS } from './testHelpers/Logger';
 import { KEYBOARD_SELECTORS } from './testHelpers/Keyboard';
+import { mount } from 'enzyme';
+import { getByTestIdSelection } from './testHelpers/Common';
+import { act } from 'react-dom/test-utils';
 
 beforeAll(() => jest.useFakeTimers());
 afterAll(() => jest.useRealTimers());
 
-const setup = () => {
-  const app = render(<App />);
+describe('App Functionality', () => {
 
-  fireInputChangeOnTextInput({
-    inputValue: KEYBOARD_KEYS.map(entry => entry.key).join(","),
-    renderedUtil: app
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = mount(<App />);
+
+    const input = wrapper.find(getByTestIdSelection(TEXT_INPUT_SELECTORS.textInput)).at(0);
+    fireInputChangeOnElement({element: input, inputValue: KEYBOARD_KEYS.map(entry => entry.key).join(",")});
   });
 
-  return app;
-};
+  test("should display logs of entered keys to the user in the logger section", async () => {
 
-test("displays logs of entered keys to the user", async () => {
-  const app = setup();
-
-  act(() => {
-    clickPlayBtn({ renderedUtil: app });
-    jest.advanceTimersByTime(KEYBOARD_KEYS.length * KEYBOARD_KEY_PRESS_TIMEOUT);
-  });
-
-  expect.hasAssertions();
-
-  const loggerElems = await waitForElement(() =>
-    app.queryAllByTestId(LOGGER_SELECTORS.logItem)
-  );
-
-  expect(loggerElems.length).toBe(KEYBOARD_KEYS.length);
-
-  loggerElems.forEach((logItem, index) => {
-    expect(logItem.textContent).toBe(KEYBOARD_KEYS[index].key);
-  });
-});
-
-test("highlights entered keys on the keyboard", async () => {
-  const app = setup();
-
-  expect.hasAssertions();
-
-  const keyboardKeys = app.getAllByTestId(KEYBOARD_SELECTORS.key);
-
-  let keyboardKeysMultiArr = [];
-
-  let sliceCount = 1;
-  for(let i = 0; i < keyboardKeys.length; i += KEYBOARD_KEYS.length) {
-    keyboardKeysMultiArr.push([...keyboardKeys].slice(i, sliceCount * KEYBOARD_KEYS.length));
-    sliceCount++;
-  }
-
-  for(let i = 0; i < KEYBOARD_KEYS.length; i++) {
+    clickPlayBtn({ wrapper });
     act(() => {
-      clickPlayBtn({ renderedUtil: app });
-      jest.advanceTimersByTime(KEYBOARD_KEY_PRESS_TIMEOUT);
+      jest.advanceTimersByTime(KEYBOARD_KEYS.length * KEYBOARD_KEY_PRESS_TIMEOUT);
     });
+    
+    wrapper.update();
+  
+    const loggerElems = wrapper.find(getByTestIdSelection(LOGGER_SELECTORS.logItem));
+    expect(loggerElems).toHaveLength(KEYBOARD_KEYS.length);
+  
+    loggerElems.forEach((logItem, index) => {
+      expect(logItem.text()).toBe(KEYBOARD_KEYS[index].key);
+    });
+  });
 
-    keyboardKeysMultiArr.forEach((kMultiItem) => {
-      expect(kMultiItem[i].className).toBe("key highlight");
-    });
-  }
+  test("should highlight entered keys on the keyboard", async () => {
+
+    expect.hasAssertions();
+    
+    clickPlayBtn({ wrapper });
+
+    for(let i = 0; i < KEYBOARD_KEYS.length; i++) {
+      act(() => {
+        jest.advanceTimersByTime(KEYBOARD_KEY_PRESS_TIMEOUT);
+      });
+
+      wrapper.update();
+
+      const keyboardKeys = wrapper.find(getByTestIdSelection(KEYBOARD_SELECTORS.key));
+
+      expect(keyboardKeys.at(i).hasClass("highlight")).toBe(true);
+    }
+  });
+
 });
+
